@@ -21,10 +21,27 @@ const restaurantSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  minDeliveryTime: {
+    type: Number,
+    required: true
+  },
+  maxDeliveryTime: {
+    type: Number,
+    required: true
+  },
+  imageUrl: {
+    type: String,
+  },
   createdAt: {
     type: Date,
     default: Date.now
-  }
+  },
+  lat: {
+    type: String,
+  },
+  lng: {
+    type: String,
+  },
 });
 
 const Restaurant = mongoose.model("Restaurant", restaurantSchema);
