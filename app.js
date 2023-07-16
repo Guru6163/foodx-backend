@@ -3,12 +3,16 @@ const morgan = require("morgan")
 const userRouter = require("./routes/userRoutes")
 const restaurantsRouter = require("./routes/restaurantRoutes")
 const menuRouter = require("./routes/menuRoutes")
+const orderRouter = require("./routes/orderRoutes")
+const deliveryPartner = require("./routes/deliveryPartnerRoutes")
 
 const app = express()
 app.use(morgan("dev"))
 app.use(express.json())
 
 app.use("/api/menu", menuRouter)
+app.use("/api/orders", orderRouter)
+app.use("/api/delivery-partners", deliveryPartner)
 app.use("/api/restaurants", restaurantsRouter)
 app.use("/api/users", userRouter)
 
