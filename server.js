@@ -1,9 +1,12 @@
 const app = require("./app")
 const dotenv = require("dotenv")
 const mongoose = require("mongoose")
+const cors = require('cors');
+
 
 dotenv.config({ path: './.env' })
 
+app.use(cors());
 const db = process.env.DATABASE_URL
 
 const port = process.env.PORT
