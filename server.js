@@ -6,7 +6,11 @@ const cors = require('cors');
 
 dotenv.config({ path: './.env' })
 
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  allowHeaders: ['Content-Type'],
+}));
+
 const db = process.env.DATABASE_URL
 
 const port = process.env.PORT
