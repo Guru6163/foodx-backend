@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt")
 
 const userSchema = new mongoose.Schema({
   firstName: {
@@ -31,9 +32,14 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please provide an address"],
   },
-  phone: {
+  phoneNumber: {
     type: String,
     required: [true, "Please provide a phone number"],
+  },
+  role: {
+    type: String,
+    enum: ["Admin", "Delivery-Partner", "User"],
+    default:"User"
   },
   lat: {
     type: String,
@@ -41,8 +47,34 @@ const userSchema = new mongoose.Schema({
   lng: {
     type: String,
   },
+  orders: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Orders",
+    },
+  ]
 
 });
+
+
+// Encrypt the password before saving the user
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (err) {
+    return next(err);
+  }
+});
+
+// Method to compare the provided password with the encrypted password
+userSchema.methods.checkPassword = async function (password, hashedPassword) {
+  return await bcrypt.compare(password, hashedPassword);
+};
+
 
 const User = mongoose.model("User", userSchema);
 
