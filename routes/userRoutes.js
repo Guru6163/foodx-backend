@@ -10,6 +10,7 @@ router.post("/signin",authController.signIn)
 router.get("/get-users-count",analyticsController.getUsersCountByDate)
 router.get("/get-orders-count",analyticsController.getOrderCountAnalytics)
 router.get("/get-order-sales",analyticsController.getTotalSalesAnalytics)
+router.get("/get-paymentMethod-data",analyticsController.getPaymentMethodAnalytics)
 
 router.route("/")
     .get(authController.protect,userController.getAllUsers)
