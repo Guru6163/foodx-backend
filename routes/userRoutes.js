@@ -1,11 +1,15 @@
 const express = require("express")
 const userController = require("../controllers/userController")
 const authController = require("../controllers/authController")
+const analyticsController = require("../controllers/analyticsController")
 
 const router = express.Router()
 
 router.post("/signup",authController.signUp)
 router.post("/signin",authController.signIn)
+router.get("/get-users-count",analyticsController.getUsersCountByDate)
+router.get("/get-orders-count",analyticsController.getOrderCountAnalytics)
+router.get("/get-order-sales",analyticsController.getTotalSalesAnalytics)
 
 router.route("/")
     .get(authController.protect,userController.getAllUsers)
