@@ -36,18 +36,14 @@ const restaurantSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  lat: {
+  lat: { 
     type: String,
+    required: true
   },
   lng: {
     type: String,
+    required: true
   },
-  menuItems: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "MenuItem",
-    },
-  ],
 });
 
 const Restaurant = mongoose.model("Restaurant", restaurantSchema);

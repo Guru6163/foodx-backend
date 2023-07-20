@@ -2,51 +2,53 @@ const MenuItem = require("../models/menuModel");
 const Restaurant = require("../models/restaurantModel");
 
 const createMenuItem = async (req, res) => {
-  const { restaurant } = req.body;
+    const { restaurantId } = req.body;
+    console.log(req.body)
+    try {
+        const restaurantExists = await Restaurant.exists({ _id: restaurantId });
 
-  try {
-    const restaurantExists = await Restaurant.exists({ _id: restaurant });
+        if (!restaurantExists) {
+            return res.status(404).json({
+                status: "fail",
+                message: "Restaurant not found.",
+            });
+        }
 
-    if (!restaurantExists) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Restaurant not found.",
-      });
+        const menuItem = await MenuItem.create(req.body);
+        res.status(201).json({
+            status: "success",
+            data: menuItem,
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: "fail",
+            message: "Failed to create menu item.",
+            error: error.message,
+        });
     }
-
-    const menuItem = await MenuItem.create(req.body);
-
-    // Add the menu item ID to the corresponding restaurant's menuItems array
-    await Restaurant.findByIdAndUpdate(
-      restaurant,
-      { $push: { menuItems: menuItem._id } },
-      { new: true }
-    );
-
-    res.status(201).json({
-      status: "success",
-      data: menuItem,
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: "fail",
-      message: "Failed to create menu item.",
-      error: error.message,
-    });
-  }
 };
 
 module.exports = {
-  createMenuItem,
+    createMenuItem,
 };
 
 
 
 
-// Get all menu items
 const getAllMenuItems = async (req, res) => {
     try {
-        const menuItems = await MenuItem.find();
+        const { restaurantId } = req.body;
+        console.log(restaurantId)
+        if (!restaurantId) {
+            return res.status(400).json({
+                status: "fail",
+                message: "restaurantId is required in the request body.",
+            });
+        }
+
+        // Query the menu items with the specified restaurantId
+        const menuItems = await MenuItem.find({ restaurantId: restaurantId });
+
         res.status(200).json({
             status: "success",
             data: menuItems,
@@ -59,6 +61,7 @@ const getAllMenuItems = async (req, res) => {
         });
     }
 };
+
 
 // Get a single menu item by ID
 const getMenuItemById = async (req, res) => {
