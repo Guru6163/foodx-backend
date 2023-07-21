@@ -8,7 +8,7 @@ const DeliveryPartner = require("../models/deliveryPartnerModel");
 const createOrder = async (req, res) => {
   const { user, restaurant, deliveryPartner, items, totalAmount, deliveryCharge, orderStatus, paymentMethod, paymentId } = req.body;
 
-  try { 
+  try {
     // Check if the user exists
     const userExists = await User.exists({ _id: user });
     if (!userExists) {
@@ -219,10 +219,42 @@ const deleteOrder = async (req, res) => {
   }
 };
 
+
+const searchOrdersByEmailorPhone = async (req, res) => {
+  const { query } = req.query;
+
+  try {
+    // Perform the search based on email or phoneNumber
+    const users = await User.find({
+      $or: [
+        { email: { $regex: query, $options: 'i' } }, // Case-insensitive search for email
+        { phoneNumber: { $regex: query, $options: 'i' } }, // Case-insensitive search for phoneNumber
+      ],
+    }).select('email phoneNumber');
+
+    // Simulate some delay to show the progress bar
+    setTimeout(() => {
+      res.status(200).json({
+        status: 'success',
+        data: users,
+      });
+    }, 1000); // You can adjust the delay as needed
+  } catch (error) {
+    res.status(500).json({
+      status: 'fail',
+      message: 'Failed to retrieve users.',
+      error: error.message,
+    });
+  }
+}
+
+
+
 module.exports = {
   createOrder,
   getAllOrders,
   getOrderById,
   updateOrder,
   deleteOrder,
+  searchOrdersByEmailorPhone
 };

@@ -2,6 +2,7 @@ const express = require("express");
 const orderController = require("../controllers/orderController");
 const router = express.Router();
 
+router.route("/search").get(orderController.searchOrdersByEmailorPhone)
 router.route("/")
   .post(orderController.createOrder)
   .get(orderController.getAllOrders);
