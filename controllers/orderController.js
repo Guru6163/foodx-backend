@@ -8,6 +8,7 @@ const DeliveryPartner = require("../models/deliveryPartnerModel");
 const createOrder = async (req, res) => {
   const { user, restaurant, deliveryPartner, items, totalAmount, deliveryCharge, orderStatus, paymentMethod, paymentId } = req.body;
 
+
   try {
     // Check if the user exists
     const userExists = await User.exists({ _id: user });
@@ -28,13 +29,16 @@ const createOrder = async (req, res) => {
     }
 
     // Check if the delivery partner exists
-    const deliveryPartnerExists = await DeliveryPartner.exists({ _id: deliveryPartner });
-    if (!deliveryPartnerExists) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Delivery partner not found.",
-      });
+    if (deliveryPartner) {
+      const deliveryPartnerExists = await DeliveryPartner.exists({ _id: deliveryPartner });
+      if (!deliveryPartnerExists) {
+        return res.status(404).json({
+          status: "fail",
+          message: "Delivery partner not found.",
+        });
+      }
     }
+
 
     // Check if all menu items exist
     const menuItemsExist = await MenuItem.find({ _id: { $in: items.map((item) => item.menuItem) } }).lean();
@@ -45,10 +49,27 @@ const createOrder = async (req, res) => {
       });
     }
 
+    const userDoc = await User.findById(user).lean();
+    const restaurantDoc = await Restaurant.findById(restaurant).lean();
+    let deliveryPartnerDoc
+    if (deliveryPartner) {
+      deliveryPartnerDoc = await DeliveryPartner.findById(deliveryPartner).lean();
+    }
+
+
     const order = await Order.create({
-      user,
-      restaurant,
-      deliveryPartner,
+      user: {
+        id: user,
+        name: userDoc.firstName + " " + userDoc.lastName, // Assuming that the user's first name is stored in the "firstName" field
+      },
+      restaurant: {
+        id: restaurant,
+        name: restaurantDoc?.name,
+      },
+      deliveryPartner: {
+        id: deliveryPartner,
+        name: deliveryPartnerDoc?.name,
+      },
       items,
       totalAmount,
       deliveryCharge,
@@ -74,6 +95,7 @@ const createOrder = async (req, res) => {
 const getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find();
+    console.log(orders)
     res.status(200).json({
       status: "success",
       data: orders,
@@ -169,9 +191,24 @@ const updateOrder = async (req, res) => {
       }
     }
 
-    order.user = user || order.user;
-    order.restaurant = restaurant || order.restaurant;
-    order.deliveryPartner = deliveryPartner || order.deliveryPartner;
+    const userDoc = await User.findById(user).lean();
+    const restaurantDoc = await Restaurant.findById(restaurant).lean();
+    let deliveryPartnerDoc
+    if (deliveryPartner) {
+      deliveryPartnerDoc = await DeliveryPartner.findById(deliveryPartner).lean();
+    }
+    order.user = {
+      id: user || order.user.id,
+      name: user ? `${userDoc.firstName} ${userDoc.lastName}` : order.user.name,
+    };
+    order.restaurant = {
+      id: restaurant || order.restaurant.id,
+      name: restaurant ? restaurantDoc?.name : order.restaurant.name,
+    };
+    order.deliveryPartner = {
+      id: deliveryPartner || order.deliveryPartner?.id,
+      name: deliveryPartner ? deliveryPartnerDoc?.name : order.deliveryPartner?.name,
+    };
     order.items = items || order.items;
     order.totalAmount = totalAmount || order.totalAmount;
     order.deliveryCharge = deliveryCharge || order.deliveryCharge;
@@ -193,6 +230,7 @@ const updateOrder = async (req, res) => {
     });
   }
 };
+
 
 // Delete an order
 const deleteOrder = async (req, res) => {

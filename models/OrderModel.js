@@ -2,20 +2,35 @@ const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema({
   user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+    id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
   },
   restaurant: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Restaurant",
-    required: true,
+    id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Restaurant",
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
   },
   deliveryPartner: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "DeliveryPartner",
-    required: true,
-    default: "Un-Assigned"
+    id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "DeliveryPartner",
+    },
+    name: {
+      type: String,
+    },
   },
   items: [
     {
