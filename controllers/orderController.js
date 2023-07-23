@@ -346,6 +346,44 @@ const getTopCustomersByFinalAmount = async (req, res) => {
   }
 };
 
+const getOrderPaymentMethodPercentage = async (req, res) => {
+  try {
+    // Count the number of COD and Online orders
+    const orderStats = await Order.aggregate([
+      {
+        $group: {
+          _id: "$paymentMethod",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // Calculate the total number of orders
+    const totalOrders = orderStats.reduce((total, stat) => total + stat.count, 0);
+
+    // Calculate the percentages
+    const pieChartData = orderStats.map((stat) => {
+      const percentage = ((stat.count / totalOrders) * 100).toFixed(2);
+      return {
+        paymentMethod: stat._id,
+        percentage: parseFloat(percentage),
+      };
+    });
+
+    res.status(200).json({
+      status: "success",
+      data: pieChartData,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "fail",
+      message: "Failed to retrieve order payment method data.",
+      error: error.message,
+    });
+  }
+};
+
+
 
 
 module.exports = {
@@ -355,5 +393,6 @@ module.exports = {
   updateOrder,
   deleteOrder,
   searchOrdersByEmailorPhone,
-  getTopCustomersByFinalAmount
+  getTopCustomersByFinalAmount,
+  getOrderPaymentMethodPercentage
 };
