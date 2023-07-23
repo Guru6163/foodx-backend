@@ -8,9 +8,8 @@ const DeliveryPartner = require("../models/deliveryPartnerModel");
 const createOrder = async (req, res) => {
   const { user, restaurant, deliveryPartner, items, totalAmount, deliveryCharge, orderStatus, paymentMethod, paymentId } = req.body;
 
-
   try {
-    // Check if the user exists
+
     const userExists = await User.exists({ _id: user });
     if (!userExists) {
       return res.status(404).json({
@@ -75,7 +74,8 @@ const createOrder = async (req, res) => {
       deliveryCharge,
       orderStatus,
       paymentMethod,
-      paymentId
+      paymentId,
+      finalAmount: parseInt(totalAmount) + parseInt(deliveryCharge)
     });
 
     res.status(201).json({
@@ -135,7 +135,7 @@ const getOrderById = async (req, res) => {
 
 // Update an order
 const updateOrder = async (req, res) => {
-  const { user, restaurant, deliveryPartner, items, totalAmount, deliveryCharge, orderStatus, paymentMethod, paymentId } = req.body;
+  const { user, restaurant, deliveryPartner, items, totalAmount, deliveryCharge, orderStatus, paymentMethod, paymentId, finalAmount } = req.body;
   const orderId = req.params.id;
 
   try {
@@ -215,6 +215,7 @@ const updateOrder = async (req, res) => {
     order.orderStatus = orderStatus || order.orderStatus;
     order.paymentMethod = paymentMethod || order.paymentMethod;
     order.paymentId = paymentId || order.paymentId;
+    order.finalAmount = totalAmount+deliveryCharge || order.totalAmount + order.deliveryCharge
 
     await order.save();
 

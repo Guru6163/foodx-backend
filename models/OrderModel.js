@@ -52,6 +52,10 @@ const orderSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  finalAmount: {
+    type: Number,
+    required: true,
+  },
   deliveryCharge: {
     type: Number,
     required: true,
