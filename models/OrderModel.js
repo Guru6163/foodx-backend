@@ -43,6 +43,9 @@ const orderSchema = new mongoose.Schema({
         type: Number,
         required: true,
       },
+      itemName:{
+        type:String,
+      }
     },
   ],
   totalAmount: {

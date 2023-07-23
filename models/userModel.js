@@ -39,7 +39,7 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
     enum: ["Admin", "Delivery-Partner", "User"],
-    default:"User"
+    default: "User"
   },
   lat: {
     type: String,
@@ -57,6 +57,20 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  favoriteRestaurants: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Restaurant",
+    },
+  ],
+  recentOrders: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Order",
+    },
+  ],
+
+
 
 
 });
