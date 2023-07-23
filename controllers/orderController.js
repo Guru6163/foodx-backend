@@ -96,7 +96,7 @@ const createOrder = async (req, res) => {
 const getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find().sort({ orderDate: -1 });
-    console.log(orders);
+
     res.status(200).json({
       status: "success",
       data: orders,
@@ -114,9 +114,20 @@ const getAllOrders = async (req, res) => {
 
 // Get a single order by ID
 const getOrderById = async (req, res) => {
+
   try {
+
     const orderId = req.params.id;
     const order = await Order.findById(orderId);
+    const userId = order?.user?.id
+    const deliveryPartnerId = order?.deliveryPartner?.id
+    const restaurantId = order?.restaurant?.id
+
+    const user = await User.findById(userId)
+    const restaurant = await Restaurant.findById(restaurantId)
+    const deliveryPartner = await User.findById(deliveryPartnerId)
+
+
     if (!order) {
       return res.status(404).json({
         status: "fail",
@@ -125,7 +136,7 @@ const getOrderById = async (req, res) => {
     }
     res.status(200).json({
       status: "success",
-      data: order,
+      data: { order, deliveryPartner, restaurant, user },
     });
   } catch (error) {
     res.status(500).json({
@@ -218,7 +229,7 @@ const updateOrder = async (req, res) => {
     order.orderStatus = orderStatus || order.orderStatus;
     order.paymentMethod = paymentMethod || order.paymentMethod;
     order.paymentId = paymentId || order.paymentId;
-    order.finalAmount = totalAmount+deliveryCharge || order.totalAmount + order.deliveryCharge
+    order.finalAmount = totalAmount + deliveryCharge || order.totalAmount + order.deliveryCharge
 
     await order.save();
 
