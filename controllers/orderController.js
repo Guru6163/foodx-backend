@@ -90,12 +90,12 @@ const createOrder = async (req, res) => {
     });
   }
 };
-
 // Get all orders
+
 const getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find();
-    console.log(orders)
+    const orders = await Order.find().sort({ createdAt: -1 });
+    console.log(orders);
     res.status(200).json({
       status: "success",
       data: orders,
@@ -108,6 +108,7 @@ const getAllOrders = async (req, res) => {
     });
   }
 };
+
 
 // Get a single order by ID
 const getOrderById = async (req, res) => {
