@@ -301,6 +301,51 @@ const searchOrdersByEmailorPhone = async (req, res) => {
   }
 }
 
+const getTopCustomersByFinalAmount = async (req, res) => {
+  try {
+    // Group orders by user and calculate the sum of FinalAmount for each user
+    const topCustomers = await Order.aggregate([
+      {
+        $group: {
+          _id: "$user.id",
+          totalFinalAmount: { $sum: "$finalAmount" },
+        },
+      },
+      {
+        $sort: { totalFinalAmount: -1 }, // Sort in descending order based on totalFinalAmount
+      },
+      {
+        $limit: 5, // Select the top 5 customers
+      },
+    ]);
+
+    // Get additional details for the top customers
+    const topCustomersWithDetails = await Promise.all(
+      topCustomers.map(async (customer) => {
+        const user = await User.findById(customer._id).lean();
+        return {
+            id: customer._id,
+            name: user.firstName + " " + user.lastName,
+            email:user.email,
+            phoneNumber:user.phoneNumber,
+            totalFinalAmount: customer.totalFinalAmount,
+        };
+      })
+    );
+
+    res.status(200).json({
+      status: "success",
+      data: topCustomersWithDetails,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "fail",
+      message: "Failed to retrieve top customers.",
+      error: error.message,
+    });
+  }
+};
+
 
 
 module.exports = {
@@ -309,5 +354,6 @@ module.exports = {
   getOrderById,
   updateOrder,
   deleteOrder,
-  searchOrdersByEmailorPhone
+  searchOrdersByEmailorPhone,
+  getTopCustomersByFinalAmount
 };
