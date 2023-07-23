@@ -92,9 +92,10 @@ const createOrder = async (req, res) => {
 };
 // Get all orders
 
+// Get all orders in descending order of createdAt (most recent first)
 const getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find().sort({ createdAt: -1 });
+    const orders = await Order.find().sort({ orderDate: -1 });
     console.log(orders);
     res.status(200).json({
       status: "success",
@@ -108,6 +109,7 @@ const getAllOrders = async (req, res) => {
     });
   }
 };
+
 
 
 // Get a single order by ID
